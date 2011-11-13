@@ -14,29 +14,64 @@ optparse = OptionParser.new do |opts|
   opts.banner = 'Usage: yt.rb [options] video'
 
   options[:count] = 10
-  opts.on( '-n', '--number', Integer, 'number of videos to list (default 1)') {|num| options[:count] = num}
+  opts.on( '-n', '--number NUMBER', 'number of videos to list (default 1)') {|num| options[:count] = num}
 
   options[:comment] = false
-  opts.on('-c', '--comment', String, 'comment on the first video using the supplied term') {|com| options[:comment] = com}
+  opts.on('-c', '--comment COMMENT', 'comment on the first video using the supplied term') {|com| options[:comment] = com}
 
   options[:index] = 1
-  opts.on('-i', '--index', Integer, 'the index of the fist video to return') {|index| options[:index] = index}
+  opts.on('-i', '--index INDEX', 'the index of the fist video to return') {|index| options[:index] = index}
 
   options[:name] = ''
-  opts.on('-u', '--user', String, 'A username') {|name| option[:name] = name}
+  opts.on('-u', '--user NAME', 'A username') {|name| options[:name] = name}
 
   options[:pw] = ''
-  opts.on('-p', '--password', String, 'A password') {|pw| optioin[:pw]= pw}
+  opts.on('-p', '--password PASSWORD', 'A password') {|pw| options[:pw] = pw}
+
+  options[:up] = ''
+  opts.ot('-u', '--upload FILE', 'A file to be uploaded') {|up| options[:up] = up}
 
 end.parse!
 
-if options[:comment] and options[:name] and options[:pw]
-  yt = YouTube::Service.new()
+if options[:comment]
+  unless options[:name]
+    p "Input a username:"
+    options[:name] = gets.chomp
+  end
+  unless options[:pw]
+    p "Input a password:"
+    options[:pw] = gets.chomp
+  end
+
+  yt = YouTube::Service.new
   printvideos vids = yt.search(ARGV.join(' '),1,1)
-  yt.comment(vids[0], options[:comment], YouTube::User.new(options[:name], options[:pw]))
+  begin
+    yt.comment(vids[0], options[:comment], YouTube::User.new(options[:name], options[:pw]))
+  rescue YouTube::BadPasswordError => e
+    p e.message
+  end
+
+elsif options[:up]
+  unless options[:name]
+    p "Input a username:"
+    options[:name] = gets.chomp
+  end
+
+  unless options[:pw]
+    p "Input a password:"
+    options[:pw] = gets.chomp
+  end
+
+  yt = YouTube::Service.new
+  printvideos vids = yt.search(ARGV.join(' '),1,1)
+  begin
+    yt.upload(options[:up], YouTube::User.new(options[:name], options[:pw]))
+  rescue YouTube::BadPasswordError => e
+    p e.message
+  end
 else
   puts options[:count]
-  printvideos YouTube::Service.new().search(ARGV.join(' '), options[:index], options[:count])
+  printvideos YouTube::Service.new.search(ARGV.join(' '), options[:index], options[:count])
 end
 
 
