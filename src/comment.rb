@@ -1,3 +1,6 @@
+#require "rubygems"
+#require "bundler/setup"
+
 require '../lib/youtube.rb'
 
 # @param vids [YouTube::Video]
@@ -10,7 +13,7 @@ end
 def comment (name, comm, user, pw)
   yt = YouTube::Service.new()
   printvideos vids = yt.search(name,1,1)
-  yt.comment(vids[0], comm, YouTube::User.new(name, pw))
+  yt.comment(vids[0], comm, YouTube::User.new(user, pw))
 end
 
 puts 'What video do you want to comment on?'
