@@ -1,4 +1,4 @@
-require '../lib/youtube.rb'
+require_relative '../lib/youtube.rb'
 require 'optparse'
 
 # @param vids [YouTube::Video]

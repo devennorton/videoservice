@@ -1,6 +1,6 @@
 require "rubygems"
 require "bundler/setup"
-require '../lib/youtube.rb'
+require_relative '../lib/youtube.rb'
 
 def upload (name, user, pw)
   YouTube::User.new(user, pw).upload name

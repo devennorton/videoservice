@@ -1,7 +1,7 @@
 require 'net/http'
 require 'openssl'
 require 'xmlsimple'
-require './multipart.rb'
+require_relative './multipart.rb'
 
 #this is going to give you a warning every time but its an easy cheat around ssl ca issues.
 OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
@@ -11,10 +11,13 @@ module YouTube
   APIVER = 2
 
   class Service
+    
+    
     def initialize(apikey = 'AI39si7O_YDdmFY6zHRqvsLfzitUNIWwqMaGX-b-_hQLXLBgv_PSJuGTSpXEocgRobUivYzZ9KXO-B_U_tJVs9D3vmGEzfnUfg')
       @key = apikey
     end
 
+    #All we really do here is get a authenticated toke for the user.
     def connect(user)
       uri = URI('https://www.google.com/accounts/ClientLogin')
       post = Net::HTTP::Post.new uri.path
@@ -32,6 +35,7 @@ module YouTube
       return response
     end
 
+    
     def upload(video, user)
       self.connect(user) unless user.token?
       uri = URI(HOST + 'feeds/api/users/default/uploads')
