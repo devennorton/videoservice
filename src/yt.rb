@@ -29,7 +29,12 @@ optparse = OptionParser.new do |opts|
   opts.on('-p', '--password PASSWORD', 'A password') {|pw| options[:pw] = pw}
 
   options[:up] = ''
-  opts.ot('-u', '--upload FILE', 'A file to be uploaded') {|up| options[:up] = up}
+  opts.on('-u', '--upload FILE', 'A file to be uploaded') {|up| options[:up] = up}
+  
+  ots.on_tail('-h', '--help', 'Show this message') do
+    puts opts
+    exit
+  end
 
 end.parse!
 

@@ -12,7 +12,8 @@ module YouTube
   APIVER = 2
 
   class Service
-    
+    #A thought, Perhaps many of this classes fuctions could be reimplemented as static class functions, 
+    #the only attribute isn't strictly required for most of the api calls to function.
     
     def initialize(apikey = 'AI39si7O_YDdmFY6zHRqvsLfzitUNIWwqMaGX-b-_hQLXLBgv_PSJuGTSpXEocgRobUivYzZ9KXO-B_U_tJVs9D3vmGEzfnUfg')
       @key = apikey
@@ -74,8 +75,10 @@ module YouTube
       return videos
     end
 
-    private
-
+    private #more like abandon hope all ye who read past here amirite?
+    
+    #This was an attempt to avoid code duplication. I'm not sure how well it all worked out. 
+    #At least the methods are fairly self explanatory.
     def _api_call(method, args)
       uri = _uri(method, args)
       response = XmlSimple.xml_in(_http_get(uri))
@@ -85,7 +88,7 @@ module YouTube
       response = nil
        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
          request = Net::HTTP::Get.new uri.request_uri
-         request.add_field('X-GData-Key', "key=#{@key}")
+         request.add_field('X-GData-Key', "key=#{@key}") if @key
          response = http.request request
        end
       response.body.to_s
@@ -97,7 +100,7 @@ module YouTube
 
     def _http_post(uri, post, user)
       post.add_field('Authorization', "GoogleLogin auth=#{user.token}")
-      post.add_field('X-GData-Key', "key=#{@key}")
+      post.add_field('X-GData-Key', "key=#{@key}") if @key
       post.add_field('GData-Version', '2')
 
       response = 0
@@ -114,6 +117,7 @@ module YouTube
 
   end
 
+  #This one has changed a lot over time its mostly a consumer of the Service class now. 
   class User
     attr_reader :name
     attr_reader :password
@@ -168,11 +172,13 @@ module YouTube
       @text = text
     end
 
+    #A helper class function for when we're pushing comments up to youtube its placement here is for semantic resons
     def self.formatString(str)
       "<?xml version=\"1.0\" encoding=\"UTF-8\"?><entry xmlns=\"http://www.w3.org/2005/Atom\" xmlns:yt=\"http://gdata.youtube.com/schemas/2007\"><content>#{str}</content></entry>"
     end
   end
 
+  #Honestly this is my favorite class around here he's just so cute!
   class Rating
     attr_reader :up
     attr_reader :down
@@ -183,10 +189,12 @@ module YouTube
     end
   end
 
+  #admitedly not the best class name
   class Uploadable
     attr_reader :filename, :file
     attr_accessor :name, :description, :category, :keywords
 
+    #Very simple initializer sets attributes largely based upon conjecture, not going to win any awards
     def initialize(file)
       raise IOError, "Cannot read #{file}" unless File.readable? file
       @file = file
@@ -197,6 +205,7 @@ module YouTube
       @description = "A video about #{@name}"
     end
 
+    #returns the atom feed formated xml for uploading a video. 
     def atom()
       atom  = "<?xml version=\"1.0\"?><entry xmlns=\"http://www.w3.org/2005/Atom\" xmlns:media=\"http://search.yahoo.com/mrss/\" "
       atom << "xmlns:yt=\"http://gdata.youtube.com/schemas/2007\"> <media:group> <media:title type=\"plain\">#{@name}"
