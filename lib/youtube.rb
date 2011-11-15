@@ -7,7 +7,8 @@ require_relative './multipart.rb'
 OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
 
 module YouTube
-  HOST = 'https://gdata.youtube.com/'
+
+  HOST = 'https://gdata.youtube.com/' #The host for the youtube data api
   APIVER = 2
 
   class Service
@@ -18,6 +19,9 @@ module YouTube
     end
 
     #All we really do here is get a authenticated toke for the user.
+    #note this is for all google properties and as such if they don't have a linked 
+    #account it will fail, OTOH this could be abstracted out if we were building 
+    #an aplicaton that connected to other google services.
     def connect(user)
       uri = URI('https://www.google.com/accounts/ClientLogin')
       post = Net::HTTP::Post.new uri.path
@@ -35,7 +39,7 @@ module YouTube
       return response
     end
 
-    
+    #Does what it sounds like uses some helper functions to create the multipart posts
     def upload(video, user)
       self.connect(user) unless user.token?
       uri = URI(HOST + 'feeds/api/users/default/uploads')
@@ -49,6 +53,7 @@ module YouTube
       _http_post(uri, post, user)
     end
 
+    #Comment on a given video
     def comment (video, str, user)
       self.connect(user) unless user.token?
       uri = URI(HOST + 'feeds/api/videos/' + video.id.to_s + '/comments')
